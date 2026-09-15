@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guillem Olalla · Portfolio técnico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16233A;
+  --ink-soft:#3D4C63;
+  --paper:#FBFAF7;
+  --panel:#FFFFFF;
+  --rule:#DAD5C9;
+  --rule-strong:#B8B1A1;
+  --live:#0F6E5C;
+  --closed:#8A8375;
+  --dim:#6E7686;
+  --wash:#F2F0EA;
+  --mono:'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  --sans:'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.55;
+  font-size:15px;
+  -webkit-font-smoothing:antialiased;
+}
+.shell{display:grid;grid-template-columns:232px 1fr;min-height:100vh;max-width:1420px;margin:0 auto}
+
+/* ---- rail ---- */
+.rail{
+  border-right:1px solid var(--rule);
+  background:var(--wash);
+  padding:26px 0 40px;
+  position:sticky;top:0;height:100vh;overflow-y:auto;
+}
+.rail .who{padding:0 20px 20px;border-bottom:1px solid var(--rule);margin-bottom:14px}
+.rail .who b{display:block;font-size:16px;font-weight:700;letter-spacing:-.01em}
+.rail .who span{display:block;font-size:12.5px;color:var(--dim);margin-top:2px}
+.rail nav{display:flex;flex-direction:column}
+.rail button{
+  font-family:var(--sans);font-size:14px;color:var(--ink-soft);
+  background:none;border:0;border-left:3px solid transparent;
+  padding:9px 20px;text-align:left;cursor:pointer;line-height:1.3;
+}
+.rail button small{display:block;font-size:11.5px;color:var(--dim);font-weight:400}
+.rail button:hover{background:#EAE7DE;color:var(--ink)}
+.rail button[aria-current="true"]{
+  border-left-color:var(--ink);background:var(--panel);color:var(--ink);font-weight:600;
+}
+.rail button:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+.rail .railnote{padding:18px 20px 0;font-size:11.5px;color:var(--dim);line-height:1.5}
+
+/* ---- content ---- */
+main{padding:34px 44px 90px;min-width:0}
+.panel{display:none}
+.panel.on{display:block}
+
+h1{font-size:30px;font-weight:700;letter-spacing:-.02em;line-height:1.15}
+h2{font-size:17px;font-weight:600;margin:32px 0 12px;letter-spacing:-.01em}
+h3{font-size:13.5px;font-weight:600;color:var(--ink-soft);margin-bottom:6px}
+p{max-width:68ch}
+.lede{font-size:16.5px;color:var(--ink-soft);margin-top:10px;max-width:66ch}
+
+.head{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;flex-wrap:wrap;
+  padding-bottom:18px;border-bottom:2px solid var(--ink)}
+.state{font-size:12px;font-family:var(--mono);white-space:nowrap;
+  border:1px solid var(--rule-strong);padding:4px 9px;border-radius:2px;color:var(--ink-soft)}
+.state.live{border-color:var(--live);color:var(--live)}
+.state.closed{border-color:var(--closed);color:var(--closed)}
+
+.meta{display:flex;gap:26px;flex-wrap:wrap;margin-top:16px;font-size:13px}
+.meta div{max-width:240px}
+.meta span{display:block;color:var(--dim);font-size:11.5px;margin-bottom:1px}
+.meta code{font-family:var(--mono);font-size:12.5px}
+
+/* flow diagram */
+.flow{display:flex;align-items:stretch;flex-wrap:wrap;gap:8px;margin:6px 0 4px}
+.flow.col{flex-direction:column;align-items:flex-start}
+.node{
+  background:var(--panel);border:1px solid var(--rule-strong);border-radius:2px;
+  padding:9px 13px;min-width:120px;font-size:13px;line-height:1.35;
+}
+.node b{display:block;font-weight:600;font-size:13.5px}
+.node em{font-style:normal;font-family:var(--mono);font-size:11.5px;color:var(--dim);display:block;margin-top:2px}
+.node.key{border-color:var(--ink);border-width:2px}
+.node.soft{background:var(--wash);border-style:dashed}
+.arrow{align-self:center;color:var(--rule-strong);font-size:16px;padding:0 2px;flex:0 0 auto}
+.branch{border-left:2px solid var(--rule);margin-left:18px;padding:8px 0 2px 18px;display:flex;flex-direction:column;gap:8px}
+.branchlabel{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-bottom:-2px}
+
+table{border-collapse:collapse;width:100%;font-size:13.5px;margin-top:4px}
+th{text-align:left;font-weight:600;font-size:12px;color:var(--dim);
+  padding:6px 12px 6px 0;border-bottom:1px solid var(--rule-strong)}
+td{padding:7px 12px 7px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+td:first-child{white-space:nowrap}
+code,.m{font-family:var(--mono);font-size:12.5px;background:var(--wash);padding:1px 4px;border-radius:2px}
+table code{background:none;padding:0}
+
+ul{list-style:none;max-width:70ch}
+li{padding-left:18px;position:relative;margin-bottom:9px}
+li::before{content:'';position:absolute;left:0;top:9px;width:7px;height:1.5px;background:var(--rule-strong)}
+li b{font-weight:600}
+
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:34px}
+@media(max-width:900px){.cols{grid-template-columns:1fr;gap:0}}
+
+.pull{border-left:3px solid var(--live);background:var(--panel);padding:14px 18px;margin-top:14px;max-width:70ch}
+.pull h3{color:var(--live);margin-bottom:4px}
+.pull p{font-size:14px;max-width:none}
+
+.num{display:flex;gap:30px;flex-wrap:wrap;margin:18px 0 4px}
+.num div{border-top:2px solid var(--ink);padding-top:8px;min-width:130px}
+.num b{display:block;font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.num span{font-size:12.5px;color:var(--dim)}
+
+/* map */
+.map{border:1px solid var(--rule-strong);background:var(--panel);padding:26px;margin-top:8px}
+.maprow{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch;margin-bottom:10px}
+.maprow:last-child{margin-bottom:0}
+.tier{font-family:var(--mono);font-size:11px;color:var(--dim);margin:16px 0 6px}
+.tier:first-child{margin-top:0}
+
+@media(max-width:820px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:static;height:auto;border-right:0;border-bottom:1px solid var(--rule)}
+  .rail nav{flex-direction:row;flex-wrap:wrap}
+  .rail button{border-left:0;border-bottom:3px solid transparent;padding:8px 14px}
+  .rail button[aria-current="true"]{border-left:0;border-bottom-color:var(--ink)}
+  .rail button small{display:none}
+  main{padding:24px 20px 60px}
+}
+@media print{
+  .rail{display:none}
+  .shell{display:block}
+  .panel{display:block!important;break-after:page}
+  main{padding:0}
+  body{background:#fff;font-size:11pt}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<aside class="rail">
+  <div class="who">
+    <b>Guillem Olalla</b>
+    <span>Portfolio técnico · sept 2026</span>
+  </div>
+  <nav id="nav">
+    <button data-p="mapa" aria-current="true">Mapa del ecosistema<small>cómo encaja todo</small></button>
+    <button data-p="mailagent">mailagent<small>clasificación de correo</small></button>
+    <button data-p="brain">brAIn + MCP<small>infraestructura</small></button>
+    <button data-p="fundaimental">FundAImental<small>SaaS de análisis</small></button>
+    <button data-p="dossier">Agente de dossiers<small>el prompt núcleo</small></button>
+    <button data-p="polymarket">Pipeline de mercado<small>scoring y validación</small></button>
+    <button data-p="n8n">Reconstrucción n8n<small>lo que viene</small></button>
+  </nav>
+  <div class="railnote">Los repos son privados. Cada ficha describe arquitectura real, no una propuesta. Encantado de hacer un walkthrough de cualquiera de ellos.<br><br><a href="https://linkedin.com/in/guillem-olalla" style="color:var(--ink)">linkedin.com/in/guillem-olalla</a></div>
+</aside>
+
+<main>
+
+<!-- ============ MAPA ============ -->
+<section class="panel on" id="mapa">
+  <div class="head">
+    <div>
+      <h1>Cinco sistemas y una espina dorsal</h1>
+      <p class="lede">Todo lo que construyo cuelga de la misma idea: un contexto versionado en Git que los modelos leen y escriben por un servidor propio, y agentes que actúan sobre ese contexto.</p>
+    </div>
+  </div>
+
+  <div class="num">
+    <div><b>~9 meses</b><span>desde la primera línea de código</span></div>
+    <div><b>7 repos</b><span>privados, con revisor automático</span></div>
+    <div><b>1 VPS</b><span>Hetzner, Ubuntu 24.04, Docker</span></div>
+    <div><b>0 puertos</b><span>abiertos en la IP pública</span></div>
+  </div>
+
+  <h2>Cómo se conecta</h2>
+  <div class="map">
+    <div class="tier">Clientes</div>
+    <div class="maprow">
+      <div class="node"><b>Claude Code</b><em>local, stdio</em></div>
+      <div class="node"><b>Claude Desktop</b><em>HTTPS</em></div>
+      <div class="node"><b>Chat web</b><em>HTTPS</em></div>
+    </div>
+
+    <div class="tier">Puente de contexto</div>
+    <div class="maprow">
+      <div class="node key"><b>mcp-brain</b><em>servidor MCP propio · Python · Docker</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Tailscale Funnel</b><em>HTTPS + token, sin puertos abiertos</em></div>
+    </div>
+
+    <div class="tier">Memoria</div>
+    <div class="maprow">
+      <div class="node key"><b>AI-Brain</b><em>identidad/ + agentes/&lt;proyecto&gt;/</em></div>
+      <div class="arrow">→</div>
+      <div class="node soft"><b>Git</b><em>cada escritura es un commit</em></div>
+    </div>
+
+    <div class="tier">Agentes y productos</div>
+    <div class="maprow">
+      <div class="node"><b>mailagent</b><em>Gmail + Calendar</em></div>
+      <div class="node"><b>FundAImental</b><em>SaaS Flask</em></div>
+      <div class="node"><b>Agente de dossiers</b><em>análisis fundamental</em></div>
+      <div class="node"><b>CV-Agent</b><em>candidaturas</em></div>
+      <div class="node soft"><b>Pipeline de mercado</b><em>cerrado ago 2026</em></div>
+    </div>
+
+    <div class="tier">Control de calidad</div>
+    <div class="maprow">
+      <div class="node"><b>revisor-action</b><em>GitHub Actions · composite action privada</em></div>
+      <div class="arrow">→</div>
+      <div class="node soft"><b>Veredicto en cada PR</b><em>5 repos</em></div>
+    </div>
+  </div>
+
+  <div class="cols">
+    <div>
+      <h2>Los tres principios que se repiten</h2>
+      <ul>
+        <li><b>Determinista antes que probabilístico.</b> Las reglas son gratis, instantáneas y auditables. El modelo entra como respaldo, nunca por defecto.</li>
+        <li><b>Nada se da por bueno sin medirlo.</b> Todo cambio en producción se valida contra datos sellados y no circulares, con scripts de solo lectura.</li>
+        <li><b>Seguro por defecto.</b> Nada se borra, todo es reversible, y lo dudoso se aparca para revisión humana en vez de adivinarse.</li>
+      </ul>
+    </div>
+    <div>
+      <h2>Stack real</h2>
+      <ul>
+        <li>Python, APIs de Anthropic y OpenAI, agentes y prompt engineering.</li>
+        <li>Linux y VPS: SSH por clave, systemd, cron, UFW, logrotate.</li>
+        <li>Docker y docker compose. Postgres con pgvector desplegado.</li>
+        <li>Git, GitHub CLI y GitHub Actions. MCP construido y en producción.</li>
+        <li>Tailscale: tailnet y Funnel para servir HTTPS sin exponer la máquina.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MAILAGENT ============ -->
+<section class="panel" id="mailagent">
+  <div class="head">
+    <div>
+      <h1>mailagent</h1>
+      <p class="lede">Clasifica una bandeja de Gmail entera en una taxonomía de etiquetas y convierte los correos de eventos en entradas de calendario. Corre como servicio permanente.</p>
+    </div>
+    <div class="state live">en producción</div>
+  </div>
+
+  <div class="meta">
+    <div><span>Repo</span><code>guillem-olalla/mailagent</code></div>
+    <div><span>Stack</span>Python 3.12, Gmail API, Calendar API, Anthropic API, icalendar, PyYAML</div>
+    <div><span>Despliegue</span>systemd o Docker</div>
+    <div><span>Alcance OAuth</span><code>gmail.modify</code></div>
+  </div>
+
+  <h2>El problema</h2>
+  <p>Una cuenta personal con unas 19.800 conversaciones, 15.700 sin leer. A mano era inviable, y los filtros inteligentes genéricos son opacos: no puedes auditar por qué han movido algo. Hacía falta un sistema transparente y de coste bajo, con reglas explícitas que yo controlo.</p>
+
+  <h2>Arquitectura</h2>
+  <div class="flow col">
+    <div class="flow">
+      <div class="node"><b>Correo nuevo</b><em>in:inbox -label:"Processat"</em></div>
+      <div class="arrow">→</div>
+      <div class="node key"><b>Etapa 1: reglas</b><em>classifier.py · coste y latencia cero</em></div>
+    </div>
+    <div class="branchlabel">si ninguna regla casa</div>
+    <div class="branch">
+      <div class="flow">
+        <div class="node"><b>Etapa 2: modelo</b><em>devuelve {category, confidence, reason}</em></div>
+        <div class="arrow">→</div>
+        <div class="node soft"><b>Bajo umbral → Revisar</b><em>cola manual, no se adivina</em></div>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="node"><b>Etiqueta + archiva</b><em>política por categoría</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Marca Processat</b><em>idempotencia</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Si es Esdeveniments</b><em>calendar_sync.py</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Crea o actualiza evento</b><em>Google Calendar</em></div>
+    </div>
+  </div>
+
+  <h2>Componentes</h2>
+  <table>
+    <thead><tr><th>Módulo</th><th>Responsabilidad</th></tr></thead>
+    <tbody>
+      <tr><td><code>config.py</code></td><td>Carga <code>.env</code> y <code>categories.yaml</code> en ajustes tipados.</td></tr>
+      <tr><td><code>gmail_client.py</code></td><td>OAuth, lectura, crear y aplicar etiquetas, archivar.</td></tr>
+      <tr><td><code>classifier.py</code></td><td>Etapa 1 reglas, etapa 2 modelo. Devuelve un objeto <code>Decision</code>.</td></tr>
+      <tr><td><code>calendar_sync.py</code></td><td>Parseo de <code>.ics</code> o extracción de fecha con el modelo, y alta o actualización del evento.</td></tr>
+      <tr><td><code>processor.py</code></td><td>Orquestación: leer, clasificar, etiquetar y archivar, calendario.</td></tr>
+      <tr><td><code>runners/poll.py</code></td><td>Bucle de sondeo. Es el runtime actual.</td></tr>
+      <tr><td><code>runners/webhook.py</code></td><td>Receptor push de Pub/Sub para el salto a event-driven.</td></tr>
+      <tr><td><code>config/categories.yaml</code></td><td>Fuente única de verdad: taxonomía, reglas y política de archivado.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Decisiones que sostienen el sistema</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li><b>Fuente única de verdad.</b> Taxonomía, reglas y archivado viven en un solo yaml. El orden de las reglas codifica la prioridad: gana la primera que casa. Cambiar comportamiento no toca código.</li>
+        <li><b>Idempotente por construcción.</b> Cada correo tratado recibe la etiqueta <code>Processat</code> y la consulta de trabajo lo excluye. El proceso se para y se reanuda sin reprocesar nada.</li>
+        <li><b>Seguro por defecto.</b> El alcance es etiquetar y archivar, sin permiso de borrado. Hay modo de prueba que imprime decisiones sin tocar la cuenta.</li>
+      </ul>
+    </div>
+    <div>
+      <ul>
+        <li><b>Comparación de dominios por límites.</b> Corrigió un fallo real: la comparación por subcadena mandaba <code>news.arcteryx.com</code> a Social porque contiene <code>x.com</code>. Ahora compara <code>remitente == regla</code> o <code>remitente.endswith("." + regla)</code>.</li>
+        <li><b>El <code>.ics</code> antes que el modelo.</b> Si el correo trae una parte <code>text/calendar</code>, se saca hora exacta y un <code>UID</code> estable gratis. El modelo solo entra cuando hay que leer una fecha en texto libre.</li>
+        <li><b>Deduplicación real.</b> Clave privada en <code>extendedProperties</code>, con el UID del <code>.ics</code> o el id del hilo. Un evento de todo el día se actualiza a evento con hora cuando aparece la hora.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Resultado</h2>
+  <div class="num">
+    <div><b>~15.000</b><span>correos archivados del backlog</span></div>
+    <div><b>11</b><span>etiquetas en la taxonomía</span></div>
+    <div><b>0 €</b><span>coste de clasificación</span></div>
+    <div><b>100%</b><span>colocado por reglas en las muestras de validación</span></div>
+  </div>
+  <p style="margin-top:14px">El modelo acabó usándose solo para extraer fechas de eventos. Ese es el hallazgo: una bandeja real viene de un conjunto repetido de remitentes, así que el determinismo cubre casi todo y el LLM se reserva para lo que de verdad es ambiguo.</p>
+
+  <div class="pull">
+    <h3>Por qué esto es un embudo de WhatsApp con otro canal</h3>
+    <p>Cambia el disparador de Gmail por un mensaje entrante, las etiquetas por etapas de lead, el umbral de confianza por el punto donde el lead pasa a un comercial, y el evento de calendario por un registro en CRM. La forma del sistema es la misma: captar, cualificar con reglas primero, escalar a modelo solo cuando hace falta, no repetir acciones sobre el mismo contacto, y dejar rastro auditable de por qué cada uno acabó donde acabó.</p>
+  </div>
+</section>
+
+<!-- ============ BRAIN ============ -->
+<section class="panel" id="brain">
+  <div class="head">
+    <div>
+      <h1>brAIn: servidor MCP y cerebro versionado</h1>
+      <p class="lede">Un servidor MCP propio que da a los modelos lectura y escritura sobre mi contexto y sobre mis repos de código, con control de acceso y flujo de pull request.</p>
+    </div>
+    <div class="state live">desplegado y en uso</div>
+  </div>
+
+  <div class="meta">
+    <div><span>Repos</span><code>mcp-brain</code>, <code>AI-Brain</code>, <code>revisor-action</code></div>
+    <div><span>Host</span>Hetzner CX23, Ubuntu 24.04, Docker</div>
+    <div><span>Red</span>Tailscale tailnet + Funnel, HTTPS, token</div>
+    <div><span>SDK</span><code>mcp[cli]&gt;=1.28,&lt;2</code></div>
+  </div>
+
+  <h2>El problema</h2>
+  <p>Volver a explicarle a un modelo quién soy y en qué estoy cada vez que abro una sesión. La memoria resumida tipo Mem0 no servía: extrae y comprime, y yo necesitaba conocimiento fiel y versionado. Así que el contexto pasó a ser un repo de Git, y el servidor MCP es el puente que lo lee y lo escribe.</p>
+
+  <h2>Dos caminos de escritura, deliberadamente distintos</h2>
+  <div class="flow col">
+    <div class="branchlabel">camino 1 · sobre el cerebro, por clon local y git</div>
+    <div class="branch">
+      <div class="flow">
+        <div class="node"><b>escribir_archivo</b></div>
+        <div class="arrow">→</div>
+        <div class="node"><b>git pull --ff-only</b><em>fail-closed</em></div>
+        <div class="arrow">→</div>
+        <div class="node"><b>commit del archivo tocado</b></div>
+        <div class="arrow">→</div>
+        <div class="node"><b>push a main</b></div>
+        <div class="arrow">→</div>
+        <div class="node soft"><b>si falla: reset --hard</b></div>
+      </div>
+    </div>
+    <div class="branchlabel">camino 2 · sobre repos de código, contra la API de GitHub, sin clonar</div>
+    <div class="branch">
+      <div class="flow">
+        <div class="node"><b>proponer_cambio</b></div>
+        <div class="arrow">→</div>
+        <div class="node"><b>rama <code>mcp/&lt;slug&gt;</code></b><em>nunca directo a main</em></div>
+        <div class="arrow">→</div>
+        <div class="node"><b>pull request</b></div>
+        <div class="arrow">→</div>
+        <div class="node key"><b>revisor-action</b><em>veredicto automático</em></div>
+        <div class="arrow">→</div>
+        <div class="node"><b>lo apruebo yo</b></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Las cinco tools</h2>
+  <table>
+    <thead><tr><th>Tool</th><th>Qué hace</th></tr></thead>
+    <tbody>
+      <tr><td><code>listar_archivos</code></td><td>Lista recursivamente los <code>.md</code> del cerebro. Sincroniza antes de listar.</td></tr>
+      <tr><td><code>leer_archivo</code></td><td>Devuelve un <code>.md</code> del cerebro. Hace <code>pull --ff-only</code> antes de leer; si no puede, sirve la copia local con un aviso delante.</td></tr>
+      <tr><td><code>escribir_archivo</code></td><td>Sobrescribe un <code>.md</code> existente y lo publica. No crea archivos.</td></tr>
+      <tr><td><code>leer_archivo_repo</code></td><td>Lee un archivo de un repo de código por API, sin clonar.</td></tr>
+      <tr><td><code>proponer_cambio</code></td><td>Escribe en una rama propia y abre un pull request.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Controles de seguridad</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li><b>Lista blanca de repos en código</b>, no en configuración. <code>mcp-brain</code> queda fuera a propósito: darle permiso para abrir PRs sobre sí mismo pondría sus propias validaciones al alcance de lo que protegen.</li>
+        <li><b>Lista negra de rutas</b>: <code>.env</code> y <code>.github/workflows/</code> no se leen ni se escriben, ni siquiera por lectura.</li>
+        <li><b>Validación anti-traversal</b>, solo <code>.md</code> en el cerebro, tope de 1 MB por archivo.</li>
+      </ul>
+    </div>
+    <div>
+      <ul>
+        <li><b>Sin puertos abiertos.</b> El contenedor escucha en la IP de la tailnet y se publica por Funnel con certificado válido. El 80, 443 y 8080 de la IP pública rechazan conexión.</li>
+        <li><b>Un fallo real y su arreglo:</b> los subprocesos de git se comían la tubería stdio del MCP. Se resolvió con <code>stdin=DEVNULL</code>, <code>GIT_TERMINAL_PROMPT=0</code> y <code>GCM_INTERACTIVE=never</code>.</li>
+        <li><b>Otro:</b> las lecturas servían un clon desfasado 28 commits. Ahora sincronizan antes de leer y, si no pueden, avisan; una escritura que arrastre ese aviso se rechaza.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pull">
+    <h3>Lo que demuestra</h3>
+    <p>Integrar IA en flujos de negocio es, en el fondo, dar a un modelo acceso controlado a sistemas reales. Esto es exactamente eso, construido y en producción: autenticación, permisos por recurso, escrituras reversibles, revisión antes de aplicar. El límite honesto es que son mis repos; todavía no he envuelto herramientas de terceros como un CRM en un servidor MCP.</p>
+  </div>
+</section>
+
+<!-- ============ FUNDAIMENTAL ============ -->
+<section class="panel" id="fundaimental">
+  <div class="head">
+    <div>
+      <h1>FundAImental</h1>
+      <p class="lede">SaaS chat-native de análisis fundamental educativo de empresas cotizadas. Enseña a leer una empresa, no dice qué comprar.</p>
+    </div>
+    <div class="state live">en producción, lanzamiento pendiente</div>
+  </div>
+
+  <div class="meta">
+    <div><span>Repo</span><code>guillem-olalla/FundAImental-SaaS</code></div>
+    <div><span>Backend</span>Flask: bloqueante, streaming SSE y lectura</div>
+    <div><span>Frontend</span>Un único <code>web/index.html</code>, sin dependencias</div>
+    <div><span>Clave interna</span><code>TICKER.Bolsa</code></div>
+  </div>
+
+  <h2>La restricción que define el producto</h2>
+  <p>Muro educativo, no negociable: sin recomendación de compra, venta o mantener, sin precio objetivo propio y sin señal de timing. El sistema separa cuatro cosas que normalmente van mezcladas: el hecho, la explicación, la interpretación y la opinión de terceros. Es una decisión de producto y también de riesgo regulatorio.</p>
+
+  <h2>Arquitectura</h2>
+  <div class="flow col">
+    <div class="flow">
+      <div class="node"><b>Chat</b><em>web/index.html · EventSource</em></div>
+      <div class="arrow">→</div>
+      <div class="node key"><b>Flask</b><em>/analyze · /analyze_stream (SSE) · /dossier</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>agent/run.py</b><em>orquesta la llamada al modelo</em></div>
+    </div>
+    <div class="branchlabel">stores abstractos, con user_id como parámetro</div>
+    <div class="branch">
+      <div class="flow">
+        <div class="node"><b>DossierStore</b><em>FilesystemGitStore · un .md por valor</em></div>
+        <div class="node"><b>TaxonomyStore</b><em>taxonomies.json global</em></div>
+        <div class="node"><b>GlossaryStore</b><em>un JSON por usuario</em></div>
+      </div>
+    </div>
+  </div>
+  <p style="margin-top:10px">Los tres stores son interfaces. Hoy van contra el sistema de archivos con auto-commit de git; mañana son Postgres con el mismo interfaz y sin tocar el resto. Esa es la parte que convierte un proyecto personal en algo multiusuario.</p>
+
+  <h2>Piezas construidas</h2>
+  <table>
+    <thead><tr><th>Pieza</th><th>Detalle</th></tr></thead>
+    <tbody>
+      <tr><td>Nomenclatura</td><td>Clave <code>TICKER.Bolsa</code>, estable y única. Resuelve la misma empresa cotizando en dos bolsas sin esconderlo.</td></tr>
+      <tr><td>Front-matter</td><td>Parser plano propio en <code>agent/store.py</code>, sin PyYAML. <code>read()</code> devuelve el cuerpo sin front-matter, así que el chat solo ve el análisis.</td></tr>
+      <tr><td>Biblioteca de términos</td><td><code>canonical_key()</code> normaliza a minúsculas y sin acentos para deduplicar. Reinsertar no duplica ni sobrescribe. Cuatro endpoints HTTP.</td></tr>
+      <tr><td>Taxonomías</td><td>Relación muchos a muchos entre valor y taxonomía. Ocho endpoints. Renombrar arrastra las asignaciones.</td></tr>
+      <tr><td>Modo sin coste</td><td><code>ANALYSIS_FAKE</code> y <code>ANALYSIS_RECORD</code>. Toda la UI se desarrolla sin gastar un céntimo en API.</td></tr>
+      <tr><td>Interfaz</td><td>Tres temas con preferencia persistida, sidebar colapsable, streaming de respuesta, microinteracciones.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Una decisión de coste que vale la pena contar</h2>
+  <p>Los términos financieros se subrayan siempre en su primera aparición, pero la explicación solo se genera si el término no está ya en la biblioteca del usuario. Y la cajita de explicación hace streaming simulado en el frontend sobre texto ya generado, no una llamada a la API por cada hover. Coste acotado y determinista, con la misma sensación en pantalla.</p>
+
+  <div class="pull">
+    <h3>Lo que demuestra</h3>
+    <p>Un producto de IA completo de punta a punta: backend, streaming, persistencia, interfaz, control de coste de tokens y una restricción de negocio que condiciona el prompt. Más el criterio de arrancar siempre en modo gratuito mientras se itera la UI.</p>
+  </div>
+</section>
+
+<!-- ============ DOSSIER ============ -->
+<section class="panel" id="dossier">
+  <div class="head">
+    <div>
+      <h1>Agente de dossiers</h1>
+      <p class="lede">El agente de análisis fundamental que vive dentro de Claude y produce un dossier por empresa. Es el precursor de FundAImental y el prompt que el SaaS porta.</p>
+    </div>
+    <div class="state live">uso diario</div>
+  </div>
+
+  <div class="meta">
+    <div><span>Prompt</span>26 secciones, versionado en AI-Brain</div>
+    <div><span>Salida</span>Un <code>.md</code> por empresa según plantilla</div>
+    <div><span>Dossiers</span>ONDS, TLN, TMDX, ASTS, PNG, ENR</div>
+  </div>
+
+  <h2>El protocolo de actualización</h2>
+  <p>La parte interesante no es el prompt, es qué pasa con el documento en la segunda sesión. Cada sección del dossier tiene una regla de escritura distinta, y eso es lo que evita que la memoria se degrade.</p>
+  <table>
+    <thead><tr><th>Regla</th><th>Secciones</th><th>Por qué</th></tr></thead>
+    <tbody>
+      <tr><td>Se sobrescribe</td><td>Metadatos, Snapshot, Guidance vs consenso vs real</td><td>Son una foto del momento. Conservar versiones antiguas solo genera ruido.</td></tr>
+      <tr><td>Se añade sin borrar</td><td>Log de eventos, Conceptos aprendidos, Fuentes</td><td>Memoria viva. Append-only, porque el valor está en la serie.</td></tr>
+      <tr><td>Se edita a demanda</td><td>Ficha, Negocio, Métricas de sector, Tesis</td><td>Solo cambian cuando cambia la realidad del negocio, no cada sesión.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Reglas de rigor sobre los datos</h2>
+  <ul>
+    <li>Cada cifra va con valor, periodo, moneda y fuente. Sin excepciones.</li>
+    <li>No se mezclan trimestres, ejercicios, TTM y estimaciones en la misma comparación.</li>
+    <li>La plantilla ya está pensada para el software: cada sección mapea a una tabla o un campo. Por eso el salto a FundAImental no obligó a rehacer el prompt.</li>
+  </ul>
+
+  <div class="pull">
+    <h3>Lo que demuestra</h3>
+    <p>Diseño de comportamiento de agente. Lo difícil de un agente que trabaja sobre un documento vivo no es generarlo la primera vez, es decidir qué se pisa y qué se acumula en la vigésima. Es el mismo problema que tiene el historial de un lead.</p>
+  </div>
+</section>
+
+<!-- ============ POLYMARKET ============ -->
+<section class="panel" id="polymarket">
+  <div class="head">
+    <div>
+      <h1>Pipeline de scoring y validación estadística</h1>
+      <p class="lede">Cinco meses en producción sobre VPS, ingesta en vivo por API, sistema de scoring ponderado por rendimiento y alertas. Lo apagué yo cuando los tests dijeron que no había señal.</p>
+    </div>
+    <div class="state closed">decomisionado, ago 2026</div>
+  </div>
+
+  <div class="meta">
+    <div><span>Repo</span><code>guillem-olalla/polymarket-copytrader</code></div>
+    <div><span>Runtime</span>3 servicios systemd, 2 crons, 1 timer</div>
+    <div><span>Alertas</span>Telegram y email</div>
+    <div><span>Duración</span>mar a ago 2026</div>
+  </div>
+
+  <h2>Arquitectura</h2>
+  <div class="flow col">
+    <div class="flow">
+      <div class="node soft"><b>analizador.py</b><em>cron 06:00 · ranking de fuentes</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>wallets.json</b></div>
+    </div>
+    <div class="flow">
+      <div class="node key"><b>monitor.py</b><em>servicio, cada 15 s</em></div>
+      <div class="arrow">→</div>
+      <div class="node key"><b>decisor.py</b><em>filtros, pesos, dimensionado</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>ejecutor.py</b><em>DRY_RUN</em></div>
+    </div>
+    <div class="flow">
+      <div class="node"><b>cierres.py</b><em>servicio, cada 30 s · stops</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>telegram_alertas.py</b><em>push instantáneo</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>email_diario.py</b><em>cron 20:00 · informe</em></div>
+    </div>
+    <div class="flow">
+      <div class="node"><b>factor_copia.py</b><em>timer systemd, horario</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>factor_copia.json</b><em>factor por fuente y contexto</em></div>
+      <div class="arrow">→</div>
+      <div class="node key"><b>validar_factor_copia.py</b><em>read-only, forward</em></div>
+    </div>
+  </div>
+
+  <h2>El sistema de scoring</h2>
+  <p>Es la parte que más se parece a un lead scoring. Cada fuente tiene un peso, y ese peso se corrige por un factor calculado sobre su historial real segmentado por contexto, con shrinkage para que las fuentes con pocos datos no se disparen.</p>
+  <ul>
+    <li><b>El peso efectivo</b> es peso por factor. Las fuentes recortadas no se descartan: se les aplica un suelo de control, porque una fuente eliminada deja de generar datos y ya no puede recuperar el sitio.</li>
+    <li><b>Cada decisión se sella</b> con el factor aplicado y el contexto. Sin ese sello no puedes cruzar después lo que el sistema creyó con lo que pasó de verdad.</li>
+    <li><b>Fallback explícito</b>: si el archivo de factores no está, factor 1.0 y sistema inactivo. Si una fuente no tiene historial en ese contexto, valor por defecto. Nunca un comportamiento indefinido.</li>
+    <li><b>Validación separada del productor.</b> <code>validar_factor_copia.py</code> es de solo lectura y cruza el sello con el resultado real. El que puntúa nunca es el que se corrige a sí mismo.</li>
+  </ul>
+
+  <h2>Robustez en producción</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li>Toda llamada a API pasa por <code>get_robusto()</code>: tres intentos, espera exponencial, timeout de 15 s, y log centralizado de errores.</li>
+        <li>Toda escritura de JSON es atómica: se escribe a <code>.tmp</code> y se renombra. Si un archivo queda corrupto, se recupera del backup horario más reciente.</li>
+      </ul>
+    </div>
+    <div>
+      <ul>
+        <li>Servicios systemd con <code>Restart=always</code> y reinicio a los 10 s. Arranque automático en boot.</li>
+        <li><code>logrotate</code> a 30 días con compresión, y 90 para el log de auditoría, con <code>copytruncate</code> para rotar sin parar el bot.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Los dos momentos que cuentan</h2>
+  <ul>
+    <li><b>El modelo sobre-optimista.</b> Los backtests ignoraban unos 20 segundos de latencia real entre el dato y la acción. Con esa latencia dentro, el resultado cambiaba. Lo detecté porque cada cambio en producción se validaba contra datos sellados y no circulares, con scripts de solo lectura que no podían mirar lo que el propio sistema había escrito.</li>
+        <li><b>El apagado.</b> Tras los tests forward fuera de muestra, la conclusión fue que no había ventaja sostenible. Lo decomisioné en vez de mantener vivo algo que no aportaba. La metodología se sostuvo, la señal no.</li>
+  </ul>
+
+  <div class="pull">
+    <h3>Lo que demuestra</h3>
+    <p>Sé montar un sistema de scoring y, sobre todo, sé auditarlo. Casi nadie que monta un lead scoring lo valida contra datos sellados, y por eso casi nadie sabe si su scoring funciona o solo confirma lo que ya creía. También sé parar a tiempo, que es la decisión que nadie quiere firmar.</p>
+  </div>
+</section>
+
+<!-- ============ N8N ============ -->
+<section class="panel" id="n8n">
+  <div class="head">
+    <div>
+      <h1>Reconstrucción de mailagent en n8n</h1>
+      <p class="lede">El diseño está cerrado y es el siguiente bloque de trabajo. Lo cuento como lo que es: arquitectura decidida, no flujo entregado.</p>
+    </div>
+    <div class="state">en construcción</div>
+  </div>
+
+  <h2>Diseño híbrido</h2>
+  <p>n8n como orquestador y un nodo de código con el clasificador determinista dentro. La fontanería, los reintentos, el disparador y la monitorización los pone n8n; la lógica a medida sigue siendo código, porque un clasificador con prioridad por orden de reglas no se representa bien como veinte nodos de condición encadenados.</p>
+
+  <div class="flow col">
+    <div class="flow">
+      <div class="node"><b>Trigger de Gmail</b><em>nodo nativo</em></div>
+      <div class="arrow">→</div>
+      <div class="node key"><b>Nodo de código</b><em>clasificador por reglas, portado</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Switch</b><em>rama por categoría</em></div>
+    </div>
+    <div class="branch">
+      <div class="flow">
+        <div class="node"><b>Etiquetar y archivar</b><em>nodo de Gmail</em></div>
+        <div class="node"><b>Cola Revisar</b><em>por debajo del umbral</em></div>
+        <div class="node"><b>Componente de calendario</b><em>compartido con el agente de resultados</em></div>
+      </div>
+    </div>
+  </div>
+
+  <h2>Por qué merece la pena migrar algo que ya funciona</h2>
+  <ul>
+    <li><b>Un segundo agente escribe en el mismo calendario.</b> El agente de resultados sigue fechas de presentaciones y dividendos de una watchlist. Hoy identifica mal la hora, no estandariza los nombres y pone mal los recordatorios. En n8n los dos comparten un único componente de calendario, con una sola nomenclatura y una sola política de avisos.</li>
+    <li><b>Visibilidad de las ejecuciones.</b> Un log en un VPS solo lo lee quien entra por SSH. Un historial de ejecuciones lo lee cualquiera del equipo.</li>
+    <li><b>Es el paso previo al event-driven.</b> El objetivo final es sustituir el sondeo por <code>watch</code> de Gmail con push por Pub/Sub, y un cron semanal que renueva la suscripción.</li>
+  </ul>
+
+  <h2>Dónde estoy</h2>
+  <p>Empecé con n8n en agosto de 2026. El plan documentado es aprender en n8n Cloud y después autoalojarlo en Docker, que es infraestructura que ya opero. Lo que aún no tengo es un flujo grande corriendo en producción, y prefiero decirlo que adornarlo. Lo que sí traigo es el sistema que va dentro del flujo, funcionando desde hace meses, y criterio sobre qué parte debe vivir en nodos y qué parte en código.</p>
+</section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var nav = document.getElementById('nav');
+  var buttons = Array.prototype.slice.call(nav.querySelectorAll('button'));
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.panel'));
+
+  function show(id){
+    panels.forEach(function(p){ p.classList.toggle('on', p.id === id); });
+    buttons.forEach(function(b){ b.setAttribute('aria-current', b.dataset.p === id ? 'true' : 'false'); });
+    window.scrollTo(0,0);
+    if (history.replaceState) history.replaceState(null,'','#'+id);
+  }
+
+  nav.addEventListener('click', function(e){
+    var b = e.target.closest('button');
+    if (b) show(b.dataset.p);
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    var i = buttons.findIndex(function(b){ return b.getAttribute('aria-current') === 'true'; });
+    if (e.key === 'ArrowDown' || e.key === 'ArrowRight'){ e.preventDefault(); show(buttons[(i+1)%buttons.length].dataset.p); }
+    if (e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ e.preventDefault(); show(buttons[(i-1+buttons.length)%buttons.length].dataset.p); }
+  });
+
+  var hash = window.location.hash.replace('#','');
+  if (hash && document.getElementById(hash)) show(hash);
+})();
+</script>
+</body>
+</html>
