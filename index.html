@@ -158,6 +158,7 @@ li b{font-weight:600}
     <button data-p="mapa" aria-current="true">Mapa del ecosistema<small>cómo encaja todo</small></button>
     <button data-p="mailagent">mailagent<small>clasificación de correo</small></button>
     <button data-p="brain">brAIn + MCP<small>infraestructura</small></button>
+    <button data-p="jobradar">job-radar<small>autopilot de candidaturas</small></button>
     <button data-p="fundaimental">FundAImental<small>SaaS de análisis</small></button>
     <button data-p="dossier">Agente de dossiers<small>el prompt núcleo</small></button>
     <button data-p="polymarket">Pipeline de mercado<small>scoring y validación</small></button>
@@ -213,6 +214,7 @@ li b{font-weight:600}
       <div class="node"><b>FundAImental</b><em>SaaS Flask</em></div>
       <div class="node"><b>Agente de dossiers</b><em>análisis fundamental</em></div>
       <div class="node"><b>CV-Agent</b><em>candidaturas</em></div>
+      <div class="node"><b>job-radar</b><em>autopilot de candidaturas</em></div>
       <div class="node soft"><b>Pipeline de mercado</b><em>cerrado ago 2026</em></div>
     </div>
 
@@ -239,7 +241,7 @@ li b{font-weight:600}
         <li>Python, APIs de Anthropic y OpenAI, agentes y prompt engineering.</li>
         <li>Linux y VPS: SSH por clave, systemd, cron, UFW, logrotate.</li>
         <li>Docker y docker compose. Postgres con pgvector desplegado.</li>
-        <li>Git, GitHub CLI y GitHub Actions. MCP construido y en producción.</li>
+        <li>Git, GitHub CLI y GitHub Actions. MCP construido, desplegado y en uso diario propio.</li>
         <li>Tailscale: tailnet y Funnel para servir HTTPS sin exponer la máquina.</li>
       </ul>
     </div>
@@ -253,7 +255,7 @@ li b{font-weight:600}
       <h1>mailagent</h1>
       <p class="lede">Clasifica una bandeja de Gmail entera en una taxonomía de etiquetas y convierte los correos de eventos en entradas de calendario. Corre como servicio permanente.</p>
     </div>
-    <div class="state live">en producción</div>
+    <div class="state live">en uso propio</div>
   </div>
 
   <div class="meta">
@@ -424,7 +426,113 @@ li b{font-weight:600}
 
   <div class="pull">
     <h3>Lo que demuestra</h3>
-    <p>Integrar IA en flujos de negocio es, en el fondo, dar a un modelo acceso controlado a sistemas reales. Esto es exactamente eso, construido y en producción: autenticación, permisos por recurso, escrituras reversibles, revisión antes de aplicar. El límite honesto es que son mis repos; todavía no he envuelto herramientas de terceros como un CRM en un servidor MCP.</p>
+    <p>Integrar IA en flujos de negocio es, en el fondo, dar a un modelo acceso controlado a sistemas reales. Esto es exactamente eso, construido, desplegado y en uso diario propio: autenticación, permisos por recurso, escrituras reversibles, revisión antes de aplicar. El límite honesto es que son mis repos; todavía no he envuelto herramientas de terceros como un CRM en un servidor MCP.</p>
+  </div>
+</section>
+
+<!-- ============ JOB-RADAR ============ -->
+<section class="panel" id="jobradar">
+  <div class="head">
+    <div>
+      <h1>job-radar: autopilot de candidaturas</h1>
+      <p class="lede">Cada mañana busca ofertas en varias fuentes, descarta por reglas, puntúa lo que queda y prepara para las buenas una candidatura completa. Cada frase se comprueba contra mis hechos, y nada se envía sin mi aprobación.</p>
+    </div>
+    <div class="state live">en uso propio</div>
+  </div>
+
+  <div class="meta">
+    <div><span>Repo</span><code>guillem-olalla/job-radar</code></div>
+    <div><span>Stack</span>Python 3.12, SQLite, Playwright, API de Anthropic, Jev (TypeSafe), Tavily</div>
+    <div><span>Despliegue</span>Docker y timer de systemd, un run al día</div>
+    <div><span>Revisión</span>Interfaz web, solo por la tailnet</div>
+  </div>
+
+  <h2>El problema</h2>
+  <p>Buscar trabajo a mano es leer cientos de ofertas para quedarte con unas pocas, y reescribir el CV y la carta para cada una. Las herramientas de aplicación masiva lo automatizan, pero no puedo auditar qué dicen de mí. Quería lo contrario: un sistema que solo escribe lo que mis hechos respaldan y que me deja la última palabra.</p>
+
+  <h2>Arquitectura</h2>
+  <div class="flow col">
+    <div class="flow">
+      <div class="node"><b>Descubrimiento</b><em>8 ATS por API · JobSpy · Tavily · JSON-LD</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Memoria SQLite</b><em>dedupe entre fuentes</em></div>
+      <div class="arrow">→</div>
+      <div class="node key"><b>Reglas en código</b><em>ubicación, título, salario · coste cero</em></div>
+    </div>
+    <div class="flow">
+      <div class="node"><b>Jev</b><em>preguntas tipadas · nota y tier en código</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Paquete con Claude</b><em>CV, carta, mensaje, respuestas</em></div>
+    </div>
+    <div class="flow">
+      <div class="node key"><b>Verificación frase a frase</b><em>Jev contra los hechos · 4 categorías</em></div>
+      <div class="arrow">→</div>
+      <div class="node key"><b>Escáner de honestidad</b><em>código · bloquea el envío</em></div>
+    </div>
+    <div class="branchlabel">si una frase no pasa o el escáner salta</div>
+    <div class="branch">
+      <div class="flow">
+        <div class="node soft"><b>Cola de revisión</b><em>con el motivo, no se adivina</em></div>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="node"><b>Mi aprobación</b><em>modo approve por defecto</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Formulario con Playwright</b><em>Greenhouse · Lever · Ashby</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Enviada</b><em>solo si aparece la confirmación</em></div>
+    </div>
+  </div>
+
+  <h2>Componentes</h2>
+  <table>
+    <thead><tr><th>Módulo</th><th>Responsabilidad</th></tr></thead>
+    <tbody>
+      <tr><td><code>discover.py</code></td><td>Búsqueda web por dominio de ATS. Una empresa nueva se sondea y, si tiene ofertas, entra en el mismo run.</td></tr>
+      <tr><td><code>sources/</code></td><td>APIs públicas de ocho ATS y JobSpy. Cada fuente va aislada: si una cae, el run sigue y lo registra.</td></tr>
+      <tr><td><code>rules.py</code></td><td>Ubicación y título, y el salario cuando la oferta lo publica. Cada descarte guarda su motivo.</td></tr>
+      <tr><td><code>policy.py</code></td><td>Nota y tier a partir de las respuestas tipadas de Jev sobre la oferta. Jev da los hechos; la puntuación es código.</td></tr>
+      <tr><td><code>package.py</code></td><td>Claude redacta el paquete con las reglas de CV-Agent. Jev verifica cada frase contra los hechos.</td></tr>
+      <tr><td><code>honesty.py</code></td><td>Escáner por texto, sin modelo. Un hallazgo bloquea el envío hasta regenerar el paquete.</td></tr>
+      <tr><td><code>apply.py</code></td><td>Rellena el formulario con Playwright. Sin login, sin crear cuentas y sin resolver CAPTCHAs.</td></tr>
+      <tr><td><code>review.py</code></td><td>Cola de revisión: aprobar, editar, rechazar o abrir el formulario relleno para que lo envíe yo.</td></tr>
+      <tr><td><code>budget.py</code></td><td>Tope de gasto mensual sobre el coste medido de cada llamada, no sobre una estimación.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>El verificador: de sí o no a cuatro categorías</h2>
+  <p>La primera versión le preguntaba a Jev, frase a frase, si cada afirmación estaba respaldada por los hechos. Sí o no. Comparando dos modelos de redacción, una carta decía que estaba acostumbrado a «leading a team, including regional management and suppliers». Mis hechos dicen interlocución con dirección regional y proveedores, no liderazgo. El sí o no la dejó pasar: el hecho existía, solo estaba inflado.</p>
+  <p style="margin-top:10px">Lo sustituí por una pregunta de cuatro opciones: habla del puesto, respaldada tal cual, exagera o deforma un hecho real, o no aparece en los hechos. Solo pasan las dos primeras, y solo si la probabilidad de respaldo llega a un umbral. Una sola frase que no pase manda el paquete entero a la cola. Esa frase se quedó como caso de regresión, en la suite y como caso obligatorio de la eval contra Jev real.</p>
+
+  <h2>Decisiones que sostienen el sistema</h2>
+  <div class="cols">
+    <div>
+      <ul>
+        <li><b>El modelo redacta, el código decide.</b> Qué se envía y qué va a la cola es política determinista y testeada. Claude escribe y Jev juzga hechos, pero ninguno de los dos aprieta el botón.</li>
+        <li><b>Escáner de honestidad con bloqueo.</b> Un modelo varía entre llamadas. Para los errores que más daño harían hay una segunda red en código: busca por texto que un proyecto aparezca en producción o con usuarios cuando no lo está. Un hallazgo bloquea el paquete: no se puede aprobar, ni marcar como enviado, ni abrir para enviarlo a mano.</li>
+      </ul>
+    </div>
+    <div>
+      <ul>
+        <li><b>Envío graduado, impuesto por código.</b> El modo por defecto pide mi aprobación. El automático se niega hasta 20 candidaturas aprobadas sin ninguna edición, y una edición reinicia la cuenta.</li>
+        <li><b>Sin atajos.</b> LinkedIn e Indeed solo sirven para descubrir. Un formulario con login, creación de cuenta o CAPTCHA visible va a la cola con el paquete listo, sin intentarlo. Un test falla si aparece en el código un plugin stealth o un user agent falseado.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Resultado</h2>
+  <div class="num">
+    <div><b>812</b><span>ofertas en memoria</span></div>
+    <div><b>116</b><span>puntuadas por Jev</span></div>
+    <div><b>24</b><span>ofertas con paquete generado</span></div>
+    <div><b>8</b><span>candidaturas enviadas, ninguna en automático</span></div>
+    <div><b>311</b><span>tests, sin red ni keys</span></div>
+  </div>
+  <p style="margin-top:14px">A 7 de octubre de 2026, de la base del radar y de la suite. Corre desde el 29 de septiembre. Las otras 696 ofertas las descartaron las reglas sin gastar una llamada a un modelo, y hay 16 paquetes con el envío bloqueado por el escáner.</p>
+
+  <div class="pull">
+    <h3>Lo que demuestra</h3>
+    <p>Un agente que actúa en mi nombre ante terceros, con la responsabilidad fuera del modelo: la verificación tiene una eval con umbral, la política tiene tests y el último clic es mío. El límite honesto es que es un sistema que uso yo, para mí, y el modo automático todavía no se ha activado.</p>
   </div>
 </section>
 
@@ -433,9 +541,9 @@ li b{font-weight:600}
   <div class="head">
     <div>
       <h1>FundAImental</h1>
-      <p class="lede">SaaS chat-native de análisis fundamental educativo de empresas cotizadas. Enseña a leer una empresa, no dice qué comprar.</p>
+      <p class="lede">SaaS chat-native de análisis fundamental educativo de empresas cotizadas. Enseña a leer una empresa, no dice qué comprar. Está desplegado, sin lanzar y sin usuarios externos, pendiente de la revisión legal de la suscripción.</p>
     </div>
-    <div class="state live">en producción, lanzamiento pendiente</div>
+    <div class="state live">desplegado, sin lanzar</div>
   </div>
 
   <div class="meta">
