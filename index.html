@@ -152,7 +152,7 @@ li b{font-weight:600}
 <aside class="rail">
   <div class="who">
     <b>Guillem Olalla</b>
-    <span>Portfolio técnico · sept 2026</span>
+    <span>Portfolio técnico · oct 2026</span>
   </div>
   <nav id="nav">
     <button data-p="mapa" aria-current="true">Mapa del ecosistema<small>cómo encaja todo</small></button>
@@ -173,14 +173,14 @@ li b{font-weight:600}
 <section class="panel on" id="mapa">
   <div class="head">
     <div>
-      <h1>Cinco sistemas y una espina dorsal</h1>
+      <h1>Seis sistemas y una espina dorsal</h1>
       <p class="lede">Todo lo que construyo cuelga de la misma idea: un contexto versionado en Git que los modelos leen y escriben por un servidor propio, y agentes que actúan sobre ese contexto.</p>
     </div>
   </div>
 
   <div class="num">
     <div><b>~9 meses</b><span>desde la primera línea de código</span></div>
-    <div><b>7 repos</b><span>privados, con revisor automático</span></div>
+    <div><b>9 repos</b><span>privados, 6 con revisor automático</span></div>
     <div><b>1 VPS</b><span>Hetzner, Ubuntu 24.04, Docker</span></div>
     <div><b>0 puertos</b><span>abiertos en la IP pública</span></div>
   </div>
@@ -222,7 +222,7 @@ li b{font-weight:600}
     <div class="maprow">
       <div class="node"><b>revisor-action</b><em>GitHub Actions · composite action privada</em></div>
       <div class="arrow">→</div>
-      <div class="node soft"><b>Veredicto en cada PR</b><em>5 repos</em></div>
+      <div class="node soft"><b>Veredicto en cada PR</b><em>6 repos</em></div>
     </div>
   </div>
 
@@ -231,7 +231,7 @@ li b{font-weight:600}
       <h2>Los tres principios que se repiten</h2>
       <ul>
         <li><b>Determinista antes que probabilístico.</b> Las reglas son gratis, instantáneas y auditables. El modelo entra como respaldo, nunca por defecto.</li>
-        <li><b>Nada se da por bueno sin medirlo.</b> Todo cambio en producción se valida contra datos sellados y no circulares, con scripts de solo lectura.</li>
+        <li><b>Nada se da por bueno sin medirlo.</b> Todo cambio se valida contra datos sellados y no circulares, con scripts de solo lectura.</li>
         <li><b>Seguro por defecto.</b> Nada se borra, todo es reversible, y lo dudoso se aparca para revisión humana en vez de adivinarse.</li>
       </ul>
     </div>
@@ -394,15 +394,19 @@ li b{font-weight:600}
     </div>
   </div>
 
-  <h2>Las cinco tools</h2>
+  <h2>Las ocho tools y un prompt</h2>
   <table>
     <thead><tr><th>Tool</th><th>Qué hace</th></tr></thead>
     <tbody>
       <tr><td><code>listar_archivos</code></td><td>Lista recursivamente los <code>.md</code> del cerebro. Sincroniza antes de listar.</td></tr>
       <tr><td><code>leer_archivo</code></td><td>Devuelve un <code>.md</code> del cerebro. Hace <code>pull --ff-only</code> antes de leer; si no puede, sirve la copia local con un aviso delante.</td></tr>
       <tr><td><code>escribir_archivo</code></td><td>Sobrescribe un <code>.md</code> existente y lo publica. No crea archivos.</td></tr>
+      <tr><td><code>editar_archivo</code></td><td>Sustituye fragmentos exactos de un <code>.md</code> del cerebro en un solo commit. Cada fragmento aparece una sola vez; si uno falla, no se toca nada.</td></tr>
       <tr><td><code>leer_archivo_repo</code></td><td>Lee un archivo de un repo de código por API, sin clonar.</td></tr>
-      <tr><td><code>proponer_cambio</code></td><td>Escribe en una rama propia y abre un pull request.</td></tr>
+      <tr><td><code>proponer_cambio</code></td><td>Escribe un archivo entero en una rama propia y abre un pull request.</td></tr>
+      <tr><td><code>editar_archivo_repo</code></td><td>Lo mismo que <code>editar_archivo</code>, en un repo de código, por rama y pull request. Si alguien cambió el archivo en medio, falla sin pisar nada.</td></tr>
+      <tr><td><code>subir_binario</code></td><td>Sube un binario, como un PDF, por rama y pull request, y comprueba que el blob publicado es idéntico al enviado.</td></tr>
+      <tr><td><code>cierre_de_sesion</code></td><td>Prompt, no tool: el procedimiento para cerrar una sesión de trabajo en el cerebro, con la fecha del día.</td></tr>
     </tbody>
   </table>
 
@@ -528,7 +532,7 @@ li b{font-weight:600}
     <div><b>8</b><span>candidaturas enviadas, ninguna en automático</span></div>
     <div><b>311</b><span>tests, sin red ni keys</span></div>
   </div>
-  <p style="margin-top:14px">A 7 de octubre de 2026, de la base del radar y de la suite. Corre desde el 29 de septiembre. Las otras 696 ofertas las descartaron las reglas sin gastar una llamada a un modelo, y hay 16 paquetes con el envío bloqueado por el escáner.</p>
+  <p style="margin-top:14px">A 7 de octubre de 2026, de la base del radar y de la suite. Corre desde el 29 de septiembre. Las otras 696 ofertas las descartaron las reglas sin gastar una llamada a un modelo, y hay 16 paquetes con el envío bloqueado: el escáner de honestidad los paró cuando corregí mis propias fuentes de hechos.</p>
 
   <div class="pull">
     <h3>Lo que demuestra</h3>
@@ -543,7 +547,7 @@ li b{font-weight:600}
       <h1>FundAImental</h1>
       <p class="lede">SaaS chat-native de análisis fundamental educativo de empresas cotizadas. Enseña a leer una empresa, no dice qué comprar. Está desplegado, sin lanzar y sin usuarios externos, pendiente de la revisión legal de la suscripción.</p>
     </div>
-    <div class="state live">desplegado, sin lanzar</div>
+    <div class="state">desplegado, sin lanzar</div>
   </div>
 
   <div class="meta">
