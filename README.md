@@ -14,3 +14,4 @@ Los repos de los sistemas que describen las fichas son privados, y el portfolio 
 ## Estructura
 
 - `index.html`: la página entera, con estilos y script en el mismo archivo.
+- `privacidad.html`: la política de privacidad de mailagent, que pide Google para publicar su app OAuth. Enlazada desde el pie de `index.html`.
