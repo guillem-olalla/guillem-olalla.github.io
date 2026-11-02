@@ -155,7 +155,7 @@ li b{font-weight:600}
 <aside class="rail">
   <div class="who">
     <b>Guillem Olalla</b>
-    <span>Portfolio técnico · oct 2026</span>
+    <span>Portfolio técnico · nov 2026</span>
   </div>
   <nav id="nav">
     <button data-p="mapa" aria-current="true">Mapa del ecosistema<small>cómo encaja todo</small></button>
@@ -165,7 +165,7 @@ li b{font-weight:600}
     <button data-p="fundaimental">FundAImental<small>SaaS de análisis</small></button>
     <button data-p="dossier">Agente de dossiers<small>el prompt núcleo</small></button>
     <button data-p="polymarket">Pipeline de mercado<small>scoring y validación</small></button>
-    <button data-p="n8n">Reconstrucción n8n<small>lo que viene</small></button>
+    <button data-p="n8n">Reconstrucción n8n<small>seco en marcha</small></button>
   </nav>
   <div class="railnote">Los repos son privados. Cada ficha describe arquitectura real, no una propuesta. Encantado de hacer un walkthrough de cualquiera de ellos.<br><br><a href="https://linkedin.com/in/guillem-olalla" style="color:var(--ink)">linkedin.com/in/guillem-olalla</a></div>
 </aside>
@@ -213,7 +213,7 @@ li b{font-weight:600}
 
     <div class="tier">Agentes y productos</div>
     <div class="maprow">
-      <div class="node"><b>mailagent</b><em>Gmail + Calendar</em></div>
+      <div class="node"><b>mailagent</b><em>Gmail · n8n</em></div>
       <div class="node"><b>FundAImental</b><em>SaaS Flask</em></div>
       <div class="node"><b>Agente de dossiers</b><em>análisis fundamental</em></div>
       <div class="node"><b>CV-Agent</b><em>candidaturas</em></div>
@@ -256,59 +256,61 @@ li b{font-weight:600}
   <div class="head">
     <div>
       <h1>mailagent</h1>
-      <p class="lede">Clasifica una bandeja de Gmail entera en una taxonomía de etiquetas y convierte los correos de eventos en entradas de calendario. Corre como servicio permanente.</p>
+      <p class="lede">Clasifica mi bandeja de Gmail en una taxonomía de etiquetas con reglas explícitas, sin modelo. n8n orquesta y decide un servicio propio, aislado y sin credenciales. Hoy corre en seco: anota qué haría con cada correo sin tocar ninguno.</p>
     </div>
-    <div class="state live">en uso propio</div>
+    <div class="state live">en seco sobre mi correo</div>
   </div>
 
   <div class="meta">
     <div><span>Repo</span><code>guillem-olalla/mailagent</code></div>
-    <div><span>Stack</span>Python 3.12, Gmail API, Calendar API, Anthropic API, icalendar, PyYAML</div>
-    <div><span>Despliegue</span>systemd o Docker</div>
-    <div><span>Alcance OAuth</span><code>gmail.modify</code></div>
+    <div><span>Stack</span>Python 3.12 (biblioteca estándar y PyYAML), n8n, API de Gmail</div>
+    <div><span>Despliegue</span>Docker en el VPS, red interna sin salida a internet</div>
+    <div><span>Alcance OAuth</span><code>gmail.metadata</code> en seco, <code>gmail.modify</code> en producción</div>
   </div>
 
   <h2>El problema</h2>
-  <p>Una cuenta personal con unas 19.800 conversaciones, 15.700 sin leer. A mano era inviable, y los filtros inteligentes genéricos son opacos: no puedes auditar por qué han movido algo. Hacía falta un sistema transparente y de coste bajo, con reglas explícitas que yo controlo.</p>
+  <p>Una cuenta personal con unas 19.800 conversaciones, 15.700 sin leer. A mano era inviable, y los filtros inteligentes genéricos son opacos: no puedes auditar por qué han movido algo. Hacía falta un sistema transparente y barato, con reglas explícitas que controlo yo.</p>
 
   <h2>Arquitectura</h2>
   <div class="flow col">
     <div class="flow">
-      <div class="node"><b>Correo nuevo</b><em>in:inbox -label:"Processat"</em></div>
+      <div class="node"><b>Cada 15 minutos</b><em>n8n · fuera de la franja de 7 a 8</em></div>
       <div class="arrow">→</div>
-      <div class="node key"><b>Etapa 1: reglas</b><em>classifier.py · coste y latencia cero</em></div>
-    </div>
-    <div class="branchlabel">si ninguna regla casa</div>
-    <div class="branch">
-      <div class="flow">
-        <div class="node"><b>Etapa 2: modelo</b><em>devuelve {category, confidence, reason}</em></div>
-        <div class="arrow">→</div>
-        <div class="node soft"><b>Bajo umbral → Revisar</b><em>cola manual, no se adivina</em></div>
-      </div>
+      <div class="node"><b>Recorre la bandeja</b><em>paginando con pageToken</em></div>
+      <div class="arrow">→</div>
+      <div class="node"><b>Pendientes</b><em>el registro dice qué ids son nuevos</em></div>
     </div>
     <div class="flow">
-      <div class="node"><b>Etiqueta + archiva</b><em>política por categoría</em></div>
+      <div class="node"><b>Lee cabeceras</b><em>solo From y Subject</em></div>
       <div class="arrow">→</div>
-      <div class="node"><b>Marca Processat</b><em>idempotencia</em></div>
+      <div class="node key"><b>clasificador</b><em>reglas de categories.yaml · coste cero</em></div>
       <div class="arrow">→</div>
-      <div class="node"><b>Si es Esdeveniments</b><em>calendar_sync.py</em></div>
-      <div class="arrow">→</div>
-      <div class="node"><b>Crea o actualiza evento</b><em>Google Calendar</em></div>
+      <div class="node"><b>Registro</b><em>una decisión por correo · 30 días</em></div>
+    </div>
+    <div class="branchlabel">en producción, cuando el seco pase el umbral</div>
+    <div class="branch">
+      <div class="flow">
+        <div class="node"><b>Etiqueta y archiva</b><em>ids resueltos con labels.list</em></div>
+        <div class="arrow">→</div>
+        <div class="node"><b>Marca Processat</b><em>in:inbox -label:Processat</em></div>
+      </div>
+      <div class="flow">
+        <div class="node soft"><b>Lo que no casa va a Revisar</b><em>se queda en la bandeja, no se adivina</em></div>
+      </div>
     </div>
   </div>
 
   <h2>Componentes</h2>
   <table>
-    <thead><tr><th>Módulo</th><th>Responsabilidad</th></tr></thead>
+    <thead><tr><th>Pieza</th><th>Responsabilidad</th></tr></thead>
     <tbody>
-      <tr><td><code>config.py</code></td><td>Carga <code>.env</code> y <code>categories.yaml</code> en ajustes tipados.</td></tr>
-      <tr><td><code>gmail_client.py</code></td><td>OAuth, lectura, crear y aplicar etiquetas, archivar.</td></tr>
-      <tr><td><code>classifier.py</code></td><td>Etapa 1 reglas, etapa 2 modelo. Devuelve un objeto <code>Decision</code>.</td></tr>
-      <tr><td><code>calendar_sync.py</code></td><td>Parseo de <code>.ics</code> o extracción de fecha con el modelo, y alta o actualización del evento.</td></tr>
-      <tr><td><code>processor.py</code></td><td>Orquestación: leer, clasificar, etiquetar y archivar, calendario.</td></tr>
-      <tr><td><code>runners/poll.py</code></td><td>Bucle de sondeo. Es el runtime actual.</td></tr>
-      <tr><td><code>runners/webhook.py</code></td><td>Receptor push de Pub/Sub para el salto a event-driven.</td></tr>
-      <tr><td><code>config/categories.yaml</code></td><td>Fuente única de verdad: taxonomía, reglas y política de archivado.</td></tr>
+      <tr><td><code>clasificador/reglas.py</code></td><td>Carga y valida <code>categories.yaml</code>. <code>decidir()</code> devuelve la etiqueta, si archiva, qué regla casó y qué etiquetas poner y quitar.</td></tr>
+      <tr><td><code>clasificador/registro.py</code></td><td>Registro de decisiones: un JSONL por día, modo 600, borrado a los 30 días y deduplicado por id.</td></tr>
+      <tr><td><code>clasificador/servidor.py</code></td><td>Servicio HTTP en la red interna, sin credenciales: <code>/pendientes</code>, <code>/clasificar</code> y <code>/salud</code>.</td></tr>
+      <tr><td><code>n8n/mailagent-seco.json</code></td><td>El flujo en seco. Solo lee.</td></tr>
+      <tr><td><code>tests/test_flujos.py</code></td><td>El guardián: lee el JSON de cada flujo y falla si puede borrar, enviar o leer algo más que cabeceras.</td></tr>
+      <tr><td><code>evaluacion/medir.py</code></td><td>Exporta una muestra de 100 decisiones para marcarla a mano y saca la precisión y la matriz de confusión.</td></tr>
+      <tr><td><code>config/categories.yaml</code></td><td>Fuente única de verdad: taxonomía, reglas y política de archivado. Fuera del repo, porque lleva datos de terceros.</td></tr>
     </tbody>
   </table>
 
@@ -316,32 +318,32 @@ li b{font-weight:600}
   <div class="cols">
     <div>
       <ul>
-        <li><b>Fuente única de verdad.</b> Taxonomía, reglas y archivado viven en un solo yaml. El orden de las reglas codifica la prioridad: gana la primera que casa. Cambiar comportamiento no toca código.</li>
-        <li><b>Idempotente por construcción.</b> Cada correo tratado recibe la etiqueta <code>Processat</code> y la consulta de trabajo lo excluye. El proceso se para y se reanuda sin reprocesar nada.</li>
-        <li><b>Seguro por defecto.</b> El alcance es etiquetar y archivar, sin permiso de borrado. Hay modo de prueba que imprime decisiones sin tocar la cuenta.</li>
+        <li><b>Solo reglas, sin modelo.</b> La primera versión, en Python, ya enseñó que una bandeja real viene de un conjunto repetido de remitentes. Lo que las reglas no colocan va a Revisar. Si esa cola necesita un modelo, lo dirán los datos del seco.</li>
+        <li><b>Fuente única de verdad.</b> Taxonomía, reglas y archivado viven en un solo yaml. El orden de las reglas codifica la prioridad: gana la primera que casa. Cambiar el comportamiento no toca código.</li>
+        <li><b>Comparación de dominios por límites.</b> Corrigió un fallo real: la comparación por subcadena mandaba <code>news.arcteryx.com</code> a Social porque contiene <code>x.com</code>. Ahora compara <code>remitente == regla</code> o <code>remitente.endswith("." + regla)</code>.</li>
       </ul>
     </div>
     <div>
       <ul>
-        <li><b>Comparación de dominios por límites.</b> Corrigió un fallo real: la comparación por subcadena mandaba <code>news.arcteryx.com</code> a Social porque contiene <code>x.com</code>. Ahora compara <code>remitente == regla</code> o <code>remitente.endswith("." + regla)</code>.</li>
-        <li><b>El <code>.ics</code> antes que el modelo.</b> Si el correo trae una parte <code>text/calendar</code>, se saca hora exacta y un <code>UID</code> estable gratis. El modelo solo entra cuando hay que leer una fecha en texto libre.</li>
-        <li><b>Deduplicación real.</b> Clave privada en <code>extendedProperties</code>, con el UID del <code>.ics</code> o el id del hilo. Un evento de todo el día se actualiza a evento con hora cuando aparece la hora.</li>
+        <li><b>Aislado por construcción.</b> El clasificador no tiene credenciales ni acceso a Gmail. Corre sin root, sin puertos, con el sistema de archivos en solo lectura y en una red de Docker sin salida a internet. El despliegue falla si el contenedor llega a internet o puede escribir en disco, y también si corre como root.</li>
+        <li><b>Los permisos, por test.</b> <code>gmail.modify</code> dejaría enviar correo o leer el cuerpo, entre otras cosas. El guardián lo impide en el JSON de cada flujo, antes de que llegue a n8n.</li>
+        <li><b>Umbral antes de escribir.</b> Producción solo arranca con una precisión de 95 % o más y cero errores en Seguretat y Finances, medidos sobre 100 decisiones marcadas a mano. El primer lote es de 20, con una prueba de deshacer.</li>
       </ul>
     </div>
   </div>
 
   <h2>Resultado</h2>
   <div class="num">
-    <div><b>~15.000</b><span>correos archivados del backlog</span></div>
-    <div><b>11</b><span>etiquetas en la taxonomía</span></div>
+    <div><b>0</b><span>diferencias con el motor de la primera versión en 20.000 casos</span></div>
+    <div><b>650</b><span>correos en la prueba de extremo a extremo, sin releer ninguno</span></div>
+    <div><b>99</b><span>tests, que corren también al construir la imagen</span></div>
     <div><b>0 €</b><span>coste de clasificación</span></div>
-    <div><b>100%</b><span>colocado por reglas en las muestras de validación</span></div>
   </div>
-  <p style="margin-top:14px">El modelo acabó usándose solo para extraer fechas de eventos. Ese es el hallazgo: una bandeja real viene de un conjunto repetido de remitentes, así que el determinismo cubre casi todo y el LLM se reserva para lo que de verdad es ambiguo.</p>
+  <p style="margin-top:14px">Las cifras salen de la suite y de una prueba con un n8n temporal contra un Gmail simulado. Las de la bandeja real llegarán con la medida del seco. La primera versión archivó unos 15.000 correos del backlog.</p>
 
   <div class="pull">
     <h3>Por qué esto es un embudo de WhatsApp con otro canal</h3>
-    <p>Cambia el disparador de Gmail por un mensaje entrante, las etiquetas por etapas de lead, el umbral de confianza por el punto donde el lead pasa a un comercial, y el evento de calendario por un registro en CRM. La forma del sistema es la misma: captar, cualificar con reglas primero, escalar a modelo solo cuando hace falta, no repetir acciones sobre el mismo contacto, y dejar rastro auditable de por qué cada uno acabó donde acabó.</p>
+    <p>Cambia el disparador de Gmail por un mensaje entrante, las etiquetas por etapas de lead y la cola Revisar por el punto donde el lead pasa a un comercial. La forma del sistema es la misma: cualificar con reglas que se pueden auditar, no repetir acciones sobre el mismo contacto, pasar a una persona lo que las reglas no deciden y dejar rastro de por qué cada uno acabó donde acabó.</p>
   </div>
 </section>
 
@@ -734,40 +736,40 @@ li b{font-weight:600}
   <div class="head">
     <div>
       <h1>Reconstrucción de mailagent en n8n</h1>
-      <p class="lede">El diseño está cerrado y es el siguiente bloque de trabajo. Lo cuento como lo que es: arquitectura decidida, no flujo entregado.</p>
+      <p class="lede">La versión nueva de mailagent: n8n orquesta y un servicio propio decide. El flujo en seco ya corre sobre mi correo. El de producción espera a que el seco pase el umbral.</p>
     </div>
-    <div class="state">en construcción</div>
+    <div class="state">seco en marcha</div>
   </div>
 
-  <h2>Diseño híbrido</h2>
-  <p>n8n como orquestador y un nodo de código con el clasificador determinista dentro. La fontanería, los reintentos, el disparador y la monitorización los pone n8n; la lógica a medida sigue siendo código, porque un clasificador con prioridad por orden de reglas no se representa bien como veinte nodos de condición encadenados.</p>
+  <h2>n8n orquesta, el código decide</h2>
+  <p>Primero lo diseñé como n8n con un nodo de código que llevara el clasificador dentro. Lo cambié antes de construirlo: las reglas habrían acabado en el JSON del flujo, que va al repo, y un nodo de código no se prueba con pytest. Ahora n8n pone el horario, las llamadas a Gmail, la paginación y los reintentos. La decisión es de un servicio con tests.</p>
 
   <div class="flow col">
     <div class="flow">
-      <div class="node"><b>Trigger de Gmail</b><em>nodo nativo</em></div>
+      <div class="node"><b>Schedule Trigger</b><em>cada 15 minutos</em></div>
       <div class="arrow">→</div>
-      <div class="node key"><b>Nodo de código</b><em>clasificador por reglas, portado</em></div>
+      <div class="node"><b>HTTP Request</b><em>credencial genérica de Google</em></div>
       <div class="arrow">→</div>
-      <div class="node"><b>Switch</b><em>rama por categoría</em></div>
-    </div>
-    <div class="branch">
-      <div class="flow">
-        <div class="node"><b>Etiquetar y archivar</b><em>nodo de Gmail</em></div>
-        <div class="node"><b>Cola Revisar</b><em>por debajo del umbral</em></div>
-        <div class="node"><b>Componente de calendario</b><em>compartido con el agente de resultados</em></div>
-      </div>
+      <div class="node key"><b>clasificador</b><em>red interna · sin credenciales</em></div>
     </div>
   </div>
 
-  <h2>Por qué merece la pena migrar algo que ya funciona</h2>
+  <h2>Lo que n8n puede hacer y lo que no</h2>
   <ul>
-    <li><b>Un segundo agente escribe en el mismo calendario.</b> El agente de resultados sigue fechas de presentaciones y dividendos de una watchlist. Hoy identifica mal la hora, no estandariza los nombres y pone mal los recordatorios. En n8n los dos comparten un único componente de calendario, con una sola nomenclatura y una sola política de avisos.</li>
+    <li><b>Sin el nodo de Gmail de n8n.</b> Pide acceso total (<code>https://mail.google.com/</code>), que incluye borrar para siempre. Las llamadas van por HTTP Request con el permiso mínimo de cada fase.</li>
+    <li><b>Sin nodos de código.</b> Un test rechaza cualquier flujo con un nodo fuera de una lista corta.</li>
+    <li><b>Las ejecuciones correctas no se guardan.</b> Llevan remitentes y asuntos. Solo quedan las que fallan.</li>
+    <li><b>Solo en la tailnet.</b> n8n no tiene ningún puerto abierto en la IP pública.</li>
+  </ul>
+
+  <h2>Por qué n8n</h2>
+  <ul>
     <li><b>Visibilidad de las ejecuciones.</b> Un log en un VPS solo lo lee quien entra por SSH. Un historial de ejecuciones lo lee cualquiera del equipo.</li>
     <li><b>Es el paso previo al event-driven.</b> El objetivo final es sustituir el sondeo por <code>watch</code> de Gmail con push por Pub/Sub, y un cron semanal que renueva la suscripción.</li>
   </ul>
 
   <h2>Dónde estoy</h2>
-  <p>Empecé con n8n en agosto de 2026. El plan documentado es aprender en n8n Cloud y después autoalojarlo en Docker, que es infraestructura que ya opero. Lo que aún no tengo es un flujo grande corriendo en producción, y prefiero decirlo que adornarlo. Lo que sí traigo es el sistema que va dentro del flujo, funcionando desde hace meses, y criterio sobre qué parte debe vivir en nodos y qué parte en código.</p>
+  <p>Empecé con n8n en agosto de 2026 y hoy lo autoalojo en Docker en mi VPS. El flujo en seco corre sobre mi correo desde noviembre de 2026. El de producción todavía no existe: lo construiré cuando el seco pase el umbral. Lo que aún no tengo es un flujo grande corriendo en producción, y prefiero decirlo que adornarlo.</p>
 </section>
 
 <footer class="foot"><a href="privacidad.html">Política de privacidad de mailagent</a></footer>
